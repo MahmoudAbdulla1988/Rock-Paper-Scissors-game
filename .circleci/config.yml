@@ -1,39 +1,21 @@
-import random
-file = open('rating.txt', 'r')
-list_on_file = file.readlines()
-full_list = []
-for i in list_on_file:
-    i.rstrip()
-    a = i.split()
-    for x in a:
-        full_list.append(x)
-name = str(input('Enter your name:'))
-print('Hello,', name)
-if name in full_list:
-    rating = int(full_list[full_list.index(name) + 1])
-else:
-    rating = 0
-while True:
-    allowable_inputs = ['rock', 'scissors', 'paper']
-    user_input = input()
-    computer_input = random.choice(allowable_inputs)
+version: 2.1
 
-    if user_input in allowable_inputs or user_input == '!exit' or user_input == '!rating':
-        if user_input == '!rating':
-            print('Your rating:', rating )
-                
-        if user_input in allowable_inputs or user_input == '!exit':
-            game_dict_winning = {'paper': 'rock', 'scissors': 'paper', 'rock': 'scissors'}
-            if game_dict_winning[computer_input] == user_input:
-                print("Sorry, but computer chose {0}".format(computer_input))
-            elif computer_input == user_input:
-                rating += 50
-                print("There is a draw ({0})".format(user_input))
-            elif user_input == '!exit':
-                print('Bye!')
-                break
-            else: 
-                rating += 100
-                print("Well done. Computer chose {0} and failed".format(computer_input))
-    else:
-        print('Invalid input')
+orbs:
+  python: circleci/python@0.2.1
+
+jobs:
+  build-and-test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/load-cache
+      - python/install-deps
+      - python/save-cache
+      - run:
+          command: ./manage.py test
+          name: Test
+
+workflows:
+  main:
+    jobs:
+      - build-and-test
